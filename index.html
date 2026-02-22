@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BKFXZ IA</title>
+
+<style>
+
+body{
+background:#0d0d0d;
+color:white;
+font-family:Arial;
+margin:0;
+padding:20px;
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+h1 span{color:#00e1ff}
+
+.container{
+width:100%;
+max-width:400px;
+}
+
+.menu{
+background:#141414;
+padding:15px;
+border-radius:10px;
+margin-bottom:10px;
+cursor:pointer;
+display:flex;
+align-items:center;
+}
+
+.icon{
+width:35px;
+height:35px;
+background:#002e33;
+display:flex;
+align-items:center;
+justify-content:center;
+margin-right:10px;
+border-radius:8px;
+}
+
+.screen{display:none}
+.active{display:block}
+
+.back{
+color:#00e1ff;
+cursor:pointer;
+margin-bottom:10px;
+display:block;
+}
+
+.result{
+background:#000;
+border:2px solid #00e1ff;
+padding:15px;
+border-radius:12px;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+padding:8px 0;
+border-bottom:1px solid #111;
+}
+
+.btn{
+background:#000;
+border:2px solid #00e1ff;
+color:#00e1ff;
+width:100%;
+padding:12px;
+margin-top:15px;
+border-radius:10px;
+cursor:pointer;
+}
+
+.scroll{
+max-height:450px;
+overflow:auto;
+}
+
+.search{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+background:#000;
+border:2px solid #00e1ff;
+color:white;
+border-radius:8px;
+}
+
+.like{
+margin-left:auto;
+cursor:pointer;
+color:#ff3b3b;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>bkfxz<span>.ia</span></h1>
+
+<div id="home" class="container screen active">
+
+<div class="menu" onclick="showScreen('famosos')">
+<div class="icon">⭐</div>
+Sensi dos Xitados
+</div>
+
+<div class="menu" onclick="sensiCelular()">
+<div class="icon">📱</div>
+Sensi Perfeita do Celular
+</div>
+
+<div class="menu" onclick="gerarIA()">
+<div class="icon">🤖</div>
+IA Sensi Perfeita
+</div>
+
+<div class="menu" onclick="gerarAleatoria()">
+<div class="icon">🔥</div>
+Gerar Sensi Aleatória
+</div>
+
+<div class="menu" onclick="ranking()">
+<div class="icon">🏆</div>
+Ranking das Sensi
+</div>
+
+</div>
+
+<div id="famosos" class="container screen">
+
+<span class="back" onclick="showScreen('home')">← voltar</span>
+
+<input class="search" placeholder="Pesquisar nick..." onkeyup="pesquisar(this.value)">
+
+<div id="lista" class="scroll"></div>
+
+</div>
+
+<div id="prep" class="container screen">
+
+<span class="back" onclick="showScreen('famosos')">← voltar</span>
+
+<h2 id="prepNome"></h2>
+
+<button class="btn" onclick="finalizar()">INJETAR SENSI</button>
+
+</div>
+
+<div id="resultado" class="container screen">
+
+<span class="back" onclick="showScreen('home')">← inicio</span>
+
+<div class="result">
+
+<div class="row"><span>GERAL</span><span id="g"></span></div>
+<div class="row"><span>RED DOT</span><span id="r"></span></div>
+<div class="row"><span>MIRA 2X</span><span id="m2"></span></div>
+<div class="row"><span>MIRA 4X</span><span id="m4"></span></div>
+<div class="row"><span>DPI</span><span id="dpi"></span></div>
+
+</div>
+
+</div>
+
+<script>
+
+let sensiAtual={}
+let dpis=[360,411,444,480,500,520,581,600,650,720,760,800,860,900,960,1100,1240]
+
+let famosos=[]
+let likes={}
+
+let nomes=[
+"GhostTap","HS Killer","DragShot","OneTap King","Aim God",
+"Headshot Demon","Tap Destroyer","HS Predator","Aim Monster","Ghost Killer",
+"Tap Machine","HS Brutal","Drag Master","Aim Sniper","Headshot Storm",
+"Tap Phantom","HS Dragon","Aim Destroyer","Ghost Predator","Tap Sniper",
+"HS Nightmare","Aim Assassin","Headshot Beast","Tap Fury","Ghost Storm",
+"HS Slayer","Aim Phantom","Tap Dominator","Headshot Killer","Ghost Beast"
+]
+
+for(let i=0;i<200;i++){
+
+let nome = nomes[i % nomes.length] + "_" + (i+1)
+
+let g=Math.floor(Math.random()*40)+160
+
+famosos.push([
+nome,
+g,
+Math.floor(g*0.9),
+Math.floor(g*1.05),
+Math.floor(g*1.1),
+dpis[Math.floor(Math.random()*dpis.length)]
+])
+
+likes[i]=0
+
+}
+
+let lista=document.getElementById("lista")
+
+function carregarLista(filtro=""){
+
+lista.innerHTML=""
+
+famosos.forEach((f,i)=>{
+
+if(f[0].toLowerCase().includes(filtro.toLowerCase())){
+
+lista.innerHTML+=`
+
+<div class="menu" onclick="preparar(${i})">
+
+<div class="icon">👤</div>
+
+${f[0]} - DPI ${f[5]}
+
+<span class="like" onclick="curtir(event,${i})">
+❤️ <span id="like${i}">${likes[i]}</span>
+</span>
+
+</div>
+
+`
+
+}
+
+})
+
+}
+
+carregarLista()
+
+function pesquisar(v){
+carregarLista(v)
+}
+
+function curtir(e,id){
+e.stopPropagation()
+likes[id]++
+document.getElementById("like"+id).innerText = likes[id]
+}
+
+function ranking(){
+
+let top = Object.entries(likes)
+.sort((a,b)=>b[1]-a[1])
+.slice(0,10)
+
+let texto="🏆 TOP SENSI\n\n"
+
+top.forEach((t,i)=>{
+texto+= (i+1)+"º "+famosos[t[0]][0]+" ❤️ "+t[1]+"\n"
+})
+
+alert(texto)
+
+}
+
+function showScreen(id){
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"))
+document.getElementById(id).classList.add("active")
+}
+
+function preparar(i){
+
+let f=famosos[i]
+
+sensiAtual={
+g:f[1],
+r:f[2],
+m2:f[3],
+m4:f[4],
+dpi:f[5]
+}
+
+prepNome.innerText=f[0]
+
+showScreen("prep")
+
+}
+
+function finalizar(){
+
+g.innerText=sensiAtual.g
+r.innerText=sensiAtual.r
+m2.innerText=sensiAtual.m2
+m4.innerText=sensiAtual.m4
+dpi.innerText=sensiAtual.dpi
+
+showScreen("resultado")
+
+}
+
+function gerarAleatoria(){
+
+let g=Math.floor(Math.random()*40)+160
+
+sensiAtual={
+g:g,
+r:Math.floor(g*0.9),
+m2:Math.floor(g*1.05),
+m4:Math.floor(g*1.1),
+dpi:dpis[Math.floor(Math.random()*dpis.length)]
+}
+
+prepNome.innerText="SENSI BKFXZ"
+
+showScreen("prep")
+
+}
+
+function gerarIA(){
+
+let g=Math.floor(Math.random()*20)+175
+
+let dpiEscolhida = dpis[Math.floor(Math.random()*dpis.length)]
+
+sensiAtual={
+g:g,
+r:Math.floor(g*0.92),
+m2:Math.floor(g*0.87),
+m4:Math.floor(g*0.82),
+dpi:dpiEscolhida
+}
+
+prepNome.innerText="IA BKFXZ PERFEITA"
+
+showScreen("prep")
+
+}
+
+function sensiCelular(){
+
+let largura = window.screen.width
+let densidade = window.devicePixelRatio
+
+let base = 170
+
+if(largura >= 1080) base = 180
+if(largura >= 1440) base = 190
+if(largura <= 720) base = 165
+
+let dpiAuto = Math.floor((densidade*400)+400)
+
+if(dpiAuto > 1200) dpiAuto = 1200
+if(dpiAuto < 400) dpiAuto = 400
+
+sensiAtual={
+g:base,
+r:Math.floor(base*0.92),
+m2:Math.floor(base*0.87),
+m4:Math.floor(base*0.82),
+dpi:dpiAuto
+}
+
+prepNome.innerText="SENSI AUTOMÁTICA DO CELULAR"
+
+showScreen("prep")
+
+}
+
+</script>
+
+</body>
+</html>
